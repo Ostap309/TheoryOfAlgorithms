@@ -1,0 +1,37 @@
+3 3
+Atlanta      Xavier      Yolanda    *Zeus
+Boston      *Yolanda     Xavier      Zeus
+Chicago     *Xavier      Yolanda     Zeus
+Xavier       Boston       Atlanta    *Chicago
+Yolanda      Atlanta     *Boston      Chicago
+Zeus        *Atlanta     Boston      Chicago
+
+3 3
+Atlanta      Xavier      Yolanda    *Zeus
+Boston       Yolanda     Zeus       *Xavier
+Chicago      Xavier      Zeus       *Yolanda
+Xavier      *Boston      Atlanta     Chicago
+Yolanda     *Chicago     Boston      Atlanta
+Zeus        *Atlanta     Boston      Chicago
+
+3 3
+Atlanta     *Xavier      Yolanda     Zeus
+Boston       Xavier     *Yolanda     Zeus
+Chicago      Yolanda    *Zeus        Xavier
+Xavier       Chicago    *Atlanta     Boston
+Yolanda      Atlanta    *Boston      Chicago
+Zeus        *Chicago     Boston      Atlanta
+
+2 3
+Atlanta     *Xavier      Yolanda     Zeus
+Boston       Xavier      Yolanda    *Zeus
+Xavier       Boston     *Atlanta
+Yolanda      Atlanta     Boston
+Zeus        *Boston      Atlanta
+
+2 3
+Atlanta     *Xavier      Yolanda     Zeus
+Boston       Xavier     *Zeus        Yolanda
+Xavier      *Atlanta     Boston
+Yolanda      Atlanta     Boston
+Zeus        *Boston      Atlanta
