@@ -1,0 +1,20 @@
+Atlanta 2   Xavier  Anna    Yolanda Zeus    Boris
+Boston  1   Yolanda Xavier  Zeus    Boris   Anna
+Chicago 1   Boris   Xavier  Yolanda Anna    Zeus
+
+Xavier      Boston  Atlanta Chicago
+Yolanda     Atlanta Boston  Chicago
+Zeus        Atlanta Boston  Chicago
+Anna        Chicago Atlanta Boston
+Boris       Chicago Boston  Atlanta
+
+
+
+Atlanta 2   Xavier  Yolanda Zeus    William Victor
+Boston  2   Xavier  Zeus    Yolanda William Victor
+
+Xavier      Boston  Atlanta
+Yolanda     Boston  Atlanta
+Zeus        Atlanta Boston
+William     Boston  Atlanta
+Victor      Atlanta Boston
