@@ -1,21 +1,31 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+import numpy as np
 import time
 
-inputs_num_list = []
-times_list = []
+SEED = 42  # Случайное начальное число
+PROBABILITY = 0.3  # Вероятность появления ребра
+N_RANGE = range(5, 3000, 10)  # Количество вершин
+RETESTS = 5  # Количество испытаний для каждого числа вершин
+
+times_mean = []  # среднее время выполнения
+times_std = []  # среднее квадратичное отклонение по времени выполнения
+
+times = np.array([None] * RETESTS)  # Массив фактического времени выполнения длины RETESTS
+pointer = 0  # Указатель на индекс массива times
 
 
 # Декоратор, измеряющий время исполнения алгоритма
 def measure_execution_time(func):
     def wrapper(*args, **kwargs):
-        global times_list
+        global times, pointer
 
         start_time = time.perf_counter()
         result = func(*args, **kwargs)
         end_time = time.perf_counter()
         execution_time = end_time - start_time
-        times_list.append(execution_time)
+        times[pointer] = execution_time
+        pointer = (pointer + 1) % RETESTS
 
         return result
 
@@ -24,26 +34,32 @@ def measure_execution_time(func):
 
 @measure_execution_time
 def algorithm(graph: nx.Graph):
-    pass
+    return len(nx.maximal_independent_set(graph))
+
+    # pos = nx.spring_layout(graph)
+    # nx.draw(graph, pos, with_labels=True, node_color='lightblue', node_size=500)
+    # plt.title("Граф Эрдеша‑Реньи (seed=42)")
+    # plt.show()
 
 
 # Создание графов, запуск алгоритма, построение графика производительности
 def main():
-    global inputs_num_list
+    global times_mean, times_std, times
 
-    SEED = 42
-    PROBABILITY = 0.3
-
-    for n in range(5, 1000, 10):
+    for n in N_RANGE:
         new_graph = nx.erdos_renyi_graph(n, p=PROBABILITY, seed=SEED)
 
-        inputs_num_list.append(n)
-        algorithm(new_graph)
+        for _ in range(RETESTS):
+            algorithm(new_graph)
+            # quit()
 
-    print(inputs_num_list)
-    print(times_list)
+        times_mean.append(times.mean())
+        times_std.append(times.std())
 
-    plt.scatter(inputs_num_list, times_list)
+    print(times_mean)
+    print(times_std)
+
+    plt.scatter(N_RANGE, times_mean)
     plt.show()
 
 
