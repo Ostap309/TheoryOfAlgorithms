@@ -5,9 +5,9 @@ import time
 
 SEED = 42  # Случайное начальное число
 PROBABILITY = 0.1  # Вероятность появления ребра
-N_RANGE = range(5, 21)  # Количество вершин
-DRAW_AND_QUIT = -1 # Преждевременная остановка с визуализацией графа (-1 - откл.)
-RETESTS = 5  # Количество испытаний для каждого числа вершин
+N_RANGE = range(5, 41, 5)  # Количество вершин
+DRAW_AND_QUIT = -1  # Преждевременная остановка с визуализацией графа (-1 - откл.)
+RETESTS = 1  # Количество испытаний для каждого числа вершин
 
 times_mean = []  # среднее время выполнения
 times_std = []  # среднее квадратичное отклонение по времени выполнения
@@ -35,6 +35,7 @@ def measure_execution_time(func):
 
 class ConnectivityList:
     def __init__(self, graph: nx.Graph):
+        """Объект хранит список связности и количество вершин графа (см. Идея 2 Список связности)"""
         self.conlist = []
         self.length = graph.number_of_nodes()
         # Для каждой вершины будем хранить маску связности в списке связности по индексу с номером этой вершины
@@ -43,6 +44,7 @@ class ConnectivityList:
 
     @staticmethod
     def to_binary(neighbors) -> int:
+        """Метод создает на основе итератора битовую маску, где каждый бит хранит связь текущей вершины с i-м соседом"""
         binary = 0
 
         # Создаем маску связности
@@ -51,6 +53,7 @@ class ConnectivityList:
         return binary
 
     def __str__(self) -> str:
+        """Метод создает текстовое представление списка связности"""
         res_str = ""
         for node, mask in enumerate(self.conlist):
             res_str += f"{node}: {bin(mask)}\n"
@@ -58,6 +61,7 @@ class ConnectivityList:
         return res_str
 
     def check_independence(self, subset: int) -> bool:
+        """Метод проверяет независимость элементов подмножества с помощью маски соседей (см. Идея 1 Битовая маска)"""
         neighbors_mask = 0
         temp = subset
         index = 0
@@ -76,15 +80,26 @@ class ConnectivityList:
 @measure_execution_time
 def algorithm(graph: nx.Graph) -> int:
     cl = ConnectivityList(graph)
-    misl = 0  # max independent set length (искомое значение)
+    misl = 1  # max independent set length (искомое значение)
 
-    cur_subset = 1
-    while cur_subset <= (1 << cl.length) - 1:
-        if cl.check_independence(cur_subset):
-            nodes_count = cur_subset.bit_count()
-            if nodes_count > misl:
-                misl = nodes_count
-        cur_subset += 1
+    independent_subsets = [0, 1]
+    step = 1
+    while step < cl.length:
+        l = len(independent_subsets)
+        for i in range(l):
+            # Добавляем к подмножеству новую вершину
+            new_subset = independent_subsets[i] | (1 << step)
+
+            # Проверка на независимость
+            if cl.check_independence(new_subset):
+                nodes_count = new_subset.bit_count()
+                if nodes_count > misl:
+                    misl = nodes_count
+
+                # Добавляем только "перспективные" подмножества
+                if nodes_count + cl.length - step - 1 > misl:
+                    independent_subsets.append(new_subset)
+        step += 1
 
     return misl
 
@@ -116,8 +131,8 @@ def main():
         times_mean.append(times.mean())
         times_std.append(times.std())
 
-    # print(times_mean)
-    # print(times_std)
+    print(times_mean)
+    print(times_std)
 
     plt.plot(N_RANGE, times_mean)
     plt.show()
