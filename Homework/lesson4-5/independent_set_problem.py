@@ -2,12 +2,16 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
 import time
+import threading
+import sys
 
 SEED = 42  # Случайное начальное число
 PROBABILITY = 0.1  # Вероятность появления ребра
-N_RANGE = range(5, 41, 5)  # Количество вершин
+N_RANGE = range(5, 1001, 3)  # Количество вершин
 DRAW_AND_QUIT = -1  # Преждевременная остановка с визуализацией графа (-1 - откл.)
-RETESTS = 1  # Количество испытаний для каждого числа вершин
+RETESTS = 10  # Количество испытаний для каждого числа вершин
+MAX_RUNTIME = 100
+STOP_NOW = False
 
 times_mean = []  # среднее время выполнения
 times_std = []  # среднее квадратичное отклонение по времени выполнения
@@ -79,6 +83,8 @@ class ConnectivityList:
 
 @measure_execution_time
 def algorithm(graph: nx.Graph) -> int:
+    global STOP_NOW
+
     cl = ConnectivityList(graph)
     misl = 1  # max independent set length (искомое значение)
 
@@ -87,6 +93,8 @@ def algorithm(graph: nx.Graph) -> int:
     while step < cl.length:
         l = len(independent_subsets)
         for i in range(l):
+            if STOP_NOW:
+                output()
             # Добавляем к подмножеству новую вершину
             new_subset = independent_subsets[i] | (1 << step)
 
@@ -104,9 +112,17 @@ def algorithm(graph: nx.Graph) -> int:
     return misl
 
 
+def stop():
+    global STOP_NOW
+    STOP_NOW = True
+
+
 # Создание графов, запуск алгоритма, построение графика производительности
 def main():
     global times_mean, times_std, times
+
+    timer = threading.Timer(MAX_RUNTIME * 60, stop)
+    timer.start()
 
     for n in N_RANGE:
         graph = nx.erdos_renyi_graph(n, p=PROBABILITY, seed=SEED)
@@ -126,16 +142,26 @@ def main():
                 pos = nx.spring_layout(sorted_graph)
                 nx.draw(sorted_graph, pos, with_labels=True, node_color='lightblue', node_size=500)
                 plt.show()
-                quit()
+                timer.cancel()
+                sys.exit(0)
 
         times_mean.append(times.mean())
         times_std.append(times.std())
 
+    timer.cancel()
+    output()
+
+
+def output():
+    global times_mean, times_std
+
     print(times_mean)
     print(times_std)
 
-    plt.plot(N_RANGE, times_mean)
+    plt.plot(list(N_RANGE[:len(times_mean)]), times_mean)
     plt.show()
+
+    sys.exit(0)
 
 
 if __name__ == '__main__':
