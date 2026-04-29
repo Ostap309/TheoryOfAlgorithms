@@ -13,8 +13,8 @@ best_result, best_order = 0, []
 for order in get_permutations_itertools(n):
     result = 0
     for t in range(n):
-        result += 100 * ri[order[t]] ** t
-        print(" +", 100 * ri[order[t]] ** t)
+        result += 100 * ri[order[t]] ** (t + 1)
+        print(" +", 100 * ri[order[t]] ** (t + 1))
     if result > best_result:
         best_result = result
         best_order = order
